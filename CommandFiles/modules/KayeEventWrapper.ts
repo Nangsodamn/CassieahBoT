@@ -13,7 +13,7 @@ export class KayeBotEvent implements KayeBotEvent.RawEvent {
   type: KayeBotEvent.RawEvent["type"];
 
   #threadIDCustom: KayeBotEvent["threadID"];
-  #messageIDCustom: KayeBotEvent["threadID"];
+  #messageIDCustom: KayeBotEvent["messageID"];
 
   constructor(
     data: Partial<KayeBotEvent.RawEvent>,
@@ -77,6 +77,7 @@ export class KayeBotEvent implements KayeBotEvent.RawEvent {
         finalBody = "[Invalid Body Mode]";
       }
     }
+    finalBody ??= "";
     const finalForm: KayeBotEvent.SuppliedDispatchForm = {
       ...form,
       finalBody,
@@ -89,7 +90,7 @@ export class KayeBotEvent implements KayeBotEvent.RawEvent {
       this.adapters.emit("dsptchTxt", finalForm, result);
     } else {
       throw new KayeBotEvent.KayeBotErr(
-        `No handlers set for dsptchFull and dsptchTxt.`
+        `No adapters set for dsptchFull and dsptchTxt.`
       );
     }
     return result;
@@ -138,6 +139,16 @@ export class KayeBotEvent implements KayeBotEvent.RawEvent {
   ): boolean {
     return this.getAdapterCount(key) >= 1;
   }
+
+  unsend(messageID: string) {
+    if (this.hasAnyAdapter("unsendMID")) {
+      const def = new KayeBotEvent.Deferred<boolean>(null);
+      this.adapters.emit("unsendMID", messageID, def);
+      return def;
+    } else {
+      throw new KayeBotEvent.KayeBotErr("No adapters set for unsendMID.");
+    }
+  }
 }
 
 export namespace KayeBotEvent {
@@ -156,6 +167,7 @@ export namespace KayeBotEvent {
   export interface ImplementationEvents {
     dsptchTxt: [SuppliedDispatchForm, Dispatched];
     dsptchFull: [SuppliedDispatchForm, Dispatched];
+    unsendMID: [string, Deferred<boolean>];
   }
 
   export interface RawEvent {
@@ -256,7 +268,7 @@ export namespace KayeBotEvent {
     async listenReplies({ timeout = Infinity }: { timeout?: number } = {}) {
       await this;
       this.emit("listen_replies");
-      if (!isFinite(timeout)) {
+      if (isFinite(timeout)) {
         return setTimeout(() => {
           this.stopListenReplies();
         });
@@ -273,9 +285,9 @@ export namespace KayeBotEvent {
     async listenReactions({ timeout = Infinity }: { timeout?: number } = {}) {
       await this;
       this.emit("listen_reactions");
-      if (!isFinite(timeout)) {
+      if (isFinite(timeout)) {
         return setTimeout(() => {
-          this.stopListenReplies();
+          this.stopListenReactions();
         });
       }
       return null;
@@ -310,6 +322,41 @@ export namespace KayeBotEvent {
       return { body: form };
     }
     return { ...form };
+  }
+
+  export class Deferred<Res, Rej = unknown> {
+    internalPromise: Promise<Res>;
+    constructor(initialValue?: Res) {
+      let res: Deferred<Res>["resolve"];
+      let rej: Deferred<Res>["reject"];
+      this.internalPromise = new Promise((res_cb, rej_cb) => {
+        res = res_cb;
+        rej = rej_cb;
+      });
+      this.resolve = (value) => {
+        if (this.status !== "pending") return;
+        this.value = value;
+        this.status = "fulfilled";
+        res(value);
+      };
+      this.reject = (reason) => {
+        if (this.status !== "pending") return;
+        this.rejectReason = reason;
+        this.status = "rejected";
+        rej(reason);
+      };
+      this.value = initialValue ?? null;
+      this.status = "pending";
+    }
+
+    status: "pending" | "fulfilled" | "rejected";
+
+    value: Res | null;
+
+    rejectReason?: Rej | null;
+
+    resolve: (value: Res) => void;
+    reject: (reason?: Rej) => void;
   }
 }
 
