@@ -2,7 +2,7 @@ import EventEmitter from "events";
 import Stream from "stream";
 
 export class KayeBotEvent implements KayeBotEvent.RawEvent {
-  implHandlers: EventEmitter<KayeBotEvent.ImplementationEvents>;
+  adapters: EventEmitter<KayeBotEvent.ImplementationEvents>;
 
   args: KayeBotEvent.RawEvent["args"];
   body: KayeBotEvent.RawEvent["body"];
@@ -17,9 +17,9 @@ export class KayeBotEvent implements KayeBotEvent.RawEvent {
 
   constructor(
     data: Partial<KayeBotEvent.RawEvent>,
-    handlers?: KayeBotEvent["implHandlers"]
+    handlers?: KayeBotEvent["adapters"]
   ) {
-    this.implHandlers = handlers ?? new EventEmitter();
+    this.adapters = handlers ?? new EventEmitter();
 
     this.body = data.body ?? "";
     this.messageID = data.messageID ?? "";
@@ -83,10 +83,10 @@ export class KayeBotEvent implements KayeBotEvent.RawEvent {
       thread: form.thread ?? this.#threadIDCustom,
       replyTo: form.replyTo ?? this.#messageIDCustom,
     };
-    if (this.hasAnyHandler("dsptchFull") && !form.forceAsText) {
-      this.implHandlers.emit("dsptchFull", finalForm, result);
-    } else if (this.hasAnyHandler("dsptchTxt")) {
-      this.implHandlers.emit("dsptchTxt", finalForm, result);
+    if (this.hasAnyAdapter("dsptchFull") && !form.forceAsText) {
+      this.adapters.emit("dsptchFull", finalForm, result);
+    } else if (this.hasAnyAdapter("dsptchTxt")) {
+      this.adapters.emit("dsptchTxt", finalForm, result);
     } else {
       throw new KayeBotEvent.KayeBotErr(
         `No handlers set for dsptchFull and dsptchTxt.`
@@ -122,21 +122,21 @@ export class KayeBotEvent implements KayeBotEvent.RawEvent {
     return result;
   }
 
-  getOneHandler<K extends keyof KayeBotEvent.ImplementationEvents>(key: K) {
-    const list = this.implHandlers.listeners(key);
+  getOneAdapter<K extends keyof KayeBotEvent.ImplementationEvents>(key: K) {
+    const list = this.adapters.listeners(key);
     return KayeBotEvent.randArr(list);
   }
 
-  getHandlerCount<K extends keyof KayeBotEvent.ImplementationEvents>(
+  getAdapterCount<K extends keyof KayeBotEvent.ImplementationEvents>(
     key: K
   ): number {
-    return this.implHandlers.listenerCount(key);
+    return this.adapters.listenerCount(key);
   }
 
-  hasAnyHandler<K extends keyof KayeBotEvent.ImplementationEvents>(
+  hasAnyAdapter<K extends keyof KayeBotEvent.ImplementationEvents>(
     key: K
   ): boolean {
-    return this.getHandlerCount(key) >= 1;
+    return this.getAdapterCount(key) >= 1;
   }
 }
 
