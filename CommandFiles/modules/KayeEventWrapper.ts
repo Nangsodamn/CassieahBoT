@@ -151,6 +151,7 @@ export namespace KayeBotEvent {
     listen_reactions: [];
     stop_listen_replies: [];
     stop_listen_reactions: [];
+    ready: [Dispatched];
   }
   export interface ImplementationEvents {
     dsptchTxt: [SuppliedDispatchForm, Dispatched];
@@ -245,6 +246,7 @@ export namespace KayeBotEvent {
       this.timestamp = info.timestamp;
       this.threadID = info.threadID;
       this.resolveInternal(this);
+      this.emit("ready", this);
     }
 
     messageID: DispatchedInfo["messageID"];
