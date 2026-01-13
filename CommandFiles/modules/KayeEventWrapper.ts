@@ -271,7 +271,7 @@ export namespace KayeBotEvent {
       if (isFinite(timeout)) {
         return setTimeout(() => {
           this.stopListenReplies();
-        });
+        }, timeout);
       }
       return null;
     }
@@ -288,7 +288,7 @@ export namespace KayeBotEvent {
       if (isFinite(timeout)) {
         return setTimeout(() => {
           this.stopListenReactions();
-        });
+        }, timeout);
       }
       return null;
     }
