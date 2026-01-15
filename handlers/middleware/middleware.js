@@ -591,6 +591,10 @@ api.${
       extra: {},
       FontSystem,
       fonts: FontSystem.fonts,
+      async runContextual(ctxual) {
+        // @ts-ignore
+        await ctxual.runInContext(runObjects);
+      },
     };
     if (Cassidy.config.DEBUG) {
       function makeProxy(a, pref = "") {

@@ -30,6 +30,11 @@ export namespace CassMenu {
      * Uses the default behavior when no subcommand provided or wrong subcommand. Useful if you want to quick validate args without custom response.
      */
     showMenu(): Promise<void>;
+
+    /**
+     * Reference instance.
+     */
+    menu: CassMenu;
   }
 
   export type OptionMap = Map<string, Option>;
@@ -79,7 +84,42 @@ export class CassMenu implements CassInteract.Contextual {
    * Not recommended to be used directly. Please refer to Ctx.runContextual(Contextual);
    * @private
    */
-  async runInContext(ctx: CassInteract.Ctx): Promise<void> {}
+  async runInContext(ctx: CassInteract.Ctx): Promise<void> {
+    try {
+      const { output, input, cancelCooldown, command, prefix, commandName } =
+        ctx;
+      output.setStyle(command.style);
+      const [subcommand, ...menuArgs] = input.arguments;
+      const extra: CassMenu.ExtraData = {
+        subcommand,
+        args: menuArgs,
+        showMenu,
+        menu: this,
+      };
+      const menu = this;
+      async function showMenu() {
+        cancelCooldown();
+        const e = [...menu.#meta.entries()];
+        let hasSomeEmoji = e.some((i) => i[1]?.emoji);
+        const mapped = e.map(([subcommand, meta]) => {
+          return `${
+            hasSomeEmoji ? `${meta.emoji ?? "✨"} ` : ""
+          }${prefix}${commandName} **${subcommand}**${
+            meta.description ? ` - ${meta.description}` : ""
+          }`;
+        });
+        await output.reply(`${mapped.join("\n")}`);
+      }
+      const found = this.option(subcommand);
+      if (!subcommand || !found) {
+        await extra.showMenu();
+        return;
+      }
+      await found(ctx, extra);
+    } catch (error) {
+      await ctx.output.error(error);
+    }
+  }
 
   /**
    * Set an option using a subcommand.

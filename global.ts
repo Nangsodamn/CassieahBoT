@@ -50,6 +50,7 @@ declare global {
   export import CanvCass = _CanvCass.CanvCass;
 
   interface CommandContextOG {
+    runContextual(contextual: CassInteract.Contextual): Promise<void>;
     /**
      * Syntactical Sugar for FS
      */
@@ -1193,6 +1194,7 @@ import * as _CanvCass from "@cass-modules/CassieahExtras";
 import OutputClass from "@cass-modules/OutputClass";
 import { BackgroundTaskFB } from "@cass-modules/BackgroundTask";
 import { WssAPI } from "./webSystem";
+import { CassInteract } from "@cass-modules/CassInteract";
 
 // import { defineOutputJSX, defineUserStatsJSX, VNode } from "@cass/define";
 declare global {
