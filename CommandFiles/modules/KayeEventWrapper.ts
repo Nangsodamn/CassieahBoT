@@ -364,6 +364,7 @@ export namespace KayeBotEvent {
   }
 }
 
+
 export function example(ev: KayeBotEvent) {
   const res = ev.send("The earth is flat.");
   res.listenReplies({ timeout: 5 * 60 * 1000 });

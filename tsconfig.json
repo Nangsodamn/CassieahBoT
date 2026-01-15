@@ -60,6 +60,7 @@
       "cassidy-userData": ["./CommandFiles/modules/cassidyUser.d.ts"],
       "neax-script": ["./CommandFiles/modules/NeaxScript"],
       "@cassidy/jsx": ["./handlers/definers/jsx-runtime"],
+      "@cass-interact": ["./CommandFiles/modules/CassInteract"],
       "@root/*": ["./*"]
     }
   },
