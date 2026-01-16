@@ -12,6 +12,7 @@ export namespace CassMenu {
     args?: (`<${string}>` | `[${string}]`)[];
     description?: string;
     emoji?: string;
+    aliases?: string[];
   }
 
   /**
@@ -98,7 +99,7 @@ export class CassMenu implements CassInteract.Contextual {
       };
       const menu = this;
       async function showMenu() {
-        cancelCooldown();
+        cancelCooldown?.();
         const e = [...menu.#meta.entries()];
         let hasSomeEmoji = e.some((i) => i[1]?.emoji);
         const mapped = e.map(([subcommand, meta]) => {
@@ -119,6 +120,63 @@ export class CassMenu implements CassInteract.Contextual {
     } catch (error) {
       await ctx.output.error(error);
     }
+  }
+
+  /**
+   * Resolves meta and option callback using an alias
+   */
+  protected resolveAliased(alias: string): {
+    option: CassMenu.Option;
+    meta: CassMenu.Meta;
+  } | null {
+    const directOption = this.#options.get(alias);
+    if (directOption) {
+      const meta = this.#meta.get(alias) ?? {};
+      return { option: directOption, meta };
+    }
+
+    for (const [subcommand, meta] of this.#meta.entries()) {
+      if (meta.aliases?.includes(alias)) {
+        const option = this.#options.get(subcommand);
+        if (option) {
+          return { option, meta };
+        }
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Resolves the option callback using an alias
+   */
+  protected resolveAliasedOpt(alias: string): CassMenu.Option | null {
+    const directOption = this.#options.get(alias);
+    if (directOption) return directOption;
+
+    for (const [subcommand, meta] of this.#meta.entries()) {
+      if (meta.aliases?.includes(alias)) {
+        return this.#options.get(subcommand) ?? null;
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Resolves meta using an alias
+   */
+  protected resolveAliasedMeta(alias: string): CassMenu.Meta | null {
+    const directMeta = this.#meta.get(alias);
+    if (directMeta) return directMeta;
+
+    for (const [, meta] of this.#meta.entries()) {
+      if (meta.aliases?.includes(alias)) {
+        return meta;
+      }
+    }
+
+    return null;
   }
 
   /**
@@ -146,7 +204,7 @@ export class CassMenu implements CassInteract.Contextual {
       return new Map(this.#options);
     }
     if (args.length === 1) {
-      return this.#options.get(args[0]);
+      return this.resolveAliasedOpt(args[0]);
     }
     const [subcommand, callback] = args;
     this.#options.set(subcommand, callback);
@@ -178,7 +236,7 @@ export class CassMenu implements CassInteract.Contextual {
       return new Map(this.#meta);
     }
     if (args.length === 1) {
-      return this.#meta.get(args[0]);
+      return this.resolveAliasedMeta(args[0]);
     }
     const [subcommand, metadata] = args;
     this.#meta.set(subcommand, metadata);
@@ -200,12 +258,12 @@ export class CassMenu implements CassInteract.Contextual {
     desc?: CassMenu.Meta["description"]
   ): CassMenu.Meta["description"] | CassMenu {
     if (typeof desc === "string") {
-      const meta = this.#meta.get(subcommand) ?? {};
+      const meta = this.resolveAliasedMeta(subcommand) ?? {};
       meta.description = desc;
       this.#meta.set(subcommand, meta);
       return this;
     }
-    const meta = this.#meta.get(subcommand) ?? {};
+    const meta = this.resolveAliasedMeta(subcommand) ?? {};
     return meta.description ?? null;
   }
 
@@ -224,12 +282,12 @@ export class CassMenu implements CassInteract.Contextual {
     emoji?: CassMenu.Meta["emoji"]
   ): CassMenu.Meta["emoji"] | CassMenu {
     if (typeof emoji === "string") {
-      const meta = this.#meta.get(subcommand) ?? {};
+      const meta = this.resolveAliasedMeta(subcommand) ?? {};
       meta.emoji = emoji;
       this.#meta.set(subcommand, meta);
       return this;
     }
-    const meta = this.#meta.get(subcommand) ?? {};
+    const meta = this.resolveAliasedMeta(subcommand) ?? {};
     return meta.emoji ?? null;
   }
 
@@ -248,13 +306,36 @@ export class CassMenu implements CassInteract.Contextual {
     args?: CassMenu.Meta["args"]
   ): CassMenu.Meta["args"] | CassMenu {
     if (Array.isArray(args)) {
-      const meta = this.#meta.get(subcommand) ?? {};
+      const meta = this.resolveAliasedMeta(subcommand) ?? {};
       meta.args = args;
       this.#meta.set(subcommand, meta);
       return this;
     }
-    const meta = this.#meta.get(subcommand) ?? {};
+    const meta = this.resolveAliasedMeta(subcommand) ?? {};
     return meta.args ?? null;
+  }
+  /**
+   * Modifies the metadata aliases.
+   */
+  aliases(subcommand: string, aliases: CassMenu.Meta["aliases"]): CassMenu;
+
+  /**
+   * Resolves the metadata aliases.
+   */
+  aliases(subcommand: string): CassMenu.Meta["aliases"];
+
+  aliases(
+    subcommand: string,
+    aliases?: CassMenu.Meta["aliases"]
+  ): CassMenu.Meta["aliases"] | CassMenu {
+    if (Array.isArray(aliases)) {
+      const meta = this.resolveAliasedMeta(subcommand) ?? {};
+      meta.aliases = aliases;
+      this.#meta.set(subcommand, meta);
+      return this;
+    }
+    const meta = this.resolveAliasedMeta(subcommand) ?? {};
+    return meta.aliases ?? null;
   }
 }
 
