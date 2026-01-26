@@ -18,7 +18,7 @@ import fs from "fs";
 export async function loadPluginsEach(
   allPlugins,
   force = false,
-  callback = async () => {}
+  callback = async () => {},
 ) {
   /**
    * @type {Record<string, Error>}
@@ -28,8 +28,11 @@ export async function loadPluginsEach(
     .readdirSync("CommandFiles/plugins")
     .filter(
       (file) =>
-        (file.endsWith(".js") || file.endsWith(".ts")) &&
-        !file.endsWith(".d.ts")
+        (file.endsWith(".js") ||
+          file.endsWith(".ts") ||
+          file.endsWith(".tsx") ||
+          file.endsWith(".jsx")) &&
+        !file.endsWith(".d.ts"),
     );
 
   for (const plugin of plugins) {
@@ -43,7 +46,7 @@ export async function loadPluginsEach(
       global.logger(
         `Cannot load '${plugin} because: 
 ${error.stack}'`,
-        "Plugin"
+        "Plugin",
       );
     }
   }
@@ -61,7 +64,7 @@ ${error.stack}'`,
 export async function loadPlugins(
   allPlugins,
   force = false,
-  callback = async () => {}
+  callback = async () => {},
 ) {
   /**
    * @type {Record<string, Error>}
@@ -69,7 +72,13 @@ export async function loadPlugins(
   const errs = {};
   const plugins = fs
     .readdirSync("CommandFiles/plugins")
-    .filter((file) => file.endsWith(".js") || file.endsWith(".ts"));
+    .filter(
+      (file) =>
+        file.endsWith(".js") ||
+        file.endsWith(".ts") ||
+        file.endsWith(".tsx") ||
+        file.endsWith(".jsx"),
+    );
 
   // const pluginPromises = plugins.map((plugin) =>
   //   loadPlugin(plugin, allPlugins, force)
@@ -98,7 +107,7 @@ export async function loadPlugins(
       callback(error, plugin, null);
       global.logger(
         `Cannot load '${plugin}' because:\n${error.stack}`,
-        "Plugin"
+        "Plugin",
       );
     }
   }
@@ -133,12 +142,12 @@ export async function loadPlugin(name, allPlugins, force = false) {
   if (meta.type !== "plugin") {
     return;
     throw new Error(
-      `Plugin ${name} is not a plugin, configure .meta.type = "plugin"`
+      `Plugin ${name} is not a plugin, configure .meta.type = "plugin"`,
     );
   }
   if (false) {
     throw new Error(
-      `Plugin '${name}' does not validly call the 'next' function from the property of the first parameter, which could imply that loading this plugin would pause the execution of the bot forever.`
+      `Plugin '${name}' does not validly call the 'next' function from the property of the first parameter, which could imply that loading this plugin would pause the execution of the bot forever.`,
     );
   }
 
@@ -149,7 +158,7 @@ export async function loadPlugin(name, allPlugins, force = false) {
     !checkCompatibility(meta.requirement || "^1.0.0", global.package.version)
   ) {
     throw new Error(
-      `Plugin ${name} requires a newer version of Cassidy. Your current Cassidy is ${global.package.version}, please update to ${meta.requirement}`
+      `Plugin ${name} requires a newer version of Cassidy. Your current Cassidy is ${global.package.version}, please update to ${meta.requirement}`,
     );
   }
   if (typeof use !== "function") {

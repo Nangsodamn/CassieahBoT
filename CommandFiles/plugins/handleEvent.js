@@ -48,7 +48,7 @@ export async function use(obj) {
           continue;
         }
 
-        console.log("Executing command event:", command.meta.name);
+        // console.log("Executing command event:", command.meta.name);
         await command.event(obj);
       } catch (error) {
         console.log("Error processing command:", error);

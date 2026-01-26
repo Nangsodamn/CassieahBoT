@@ -68,7 +68,6 @@ export const CROP_CONFIG = {
 export async function fetchSeedStock() {
   try {
     const res = await axios.get<FetchedSeedStock>(CROP_CONFIG.STOCK_SEED_URL);
-    console.log("STOCK", res.data);
     return res.data;
   } catch (error) {
     console.error(error?.stack);

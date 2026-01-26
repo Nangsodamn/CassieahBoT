@@ -782,7 +782,6 @@ async function refreshShopStock(force = false) {
   if (timeLeft > 0 && !force) {
     return false;
   }
-  console.log("Restocking...");
   let stocks: Awaited<ReturnType<typeof fetchSeedStock>>;
   if (USE_TRUE_STOCK) {
     stocks = await fetchSeedStock();
@@ -797,11 +796,6 @@ async function refreshShopStock(force = false) {
       const timeLeft =
         (Math.abs(timePassed) % gardenShop.stockRefreshInterval) + 1000;
       gardenShop.lastRestock = currentTime - Math.abs(timeLeft);
-      console.log({
-        timeLeft,
-        timePassed,
-        newRestock: currentTime - timeLeft,
-      });
       if (getTimeUntilRestock() <= 0) {
         gardenShop.lastRestock = currentTime;
       }

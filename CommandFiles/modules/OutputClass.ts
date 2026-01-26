@@ -104,7 +104,7 @@ export class OutputClass implements OutputProps {
   }
 
   canWorkWithEvent(
-    _ctx: CommandContext | NoEventCMDContext
+    _ctx: CommandContext | NoEventCMDContext,
   ): _ctx is CommandContext {
     return !this.NO_EVENT_MODE;
   }
@@ -212,7 +212,7 @@ export class OutputClass implements OutputProps {
   async req(
     url: string,
     params?: Record<string, any>,
-    configOrMethod: AxiosRequestConfig["method"] | AxiosRequestConfig = "GET"
+    configOrMethod: AxiosRequestConfig["method"] | AxiosRequestConfig = "GET",
   ): Promise<any> {
     let finalUrl = url;
 
@@ -246,7 +246,7 @@ export class OutputClass implements OutputProps {
    */
   reply(
     body: OutputForm,
-    callback?: (info: OutputSent) => void
+    callback?: (info: OutputSent) => void,
   ): Promise<OutputSent>;
 
   /**
@@ -258,8 +258,8 @@ export class OutputClass implements OutputProps {
     replyListener: (
       ctx: CommandContext & {
         repObj: PromiseStandardReplyArg<T>;
-      }
-    ) => any | Promise<any>
+      },
+    ) => any | Promise<any>,
   ): Promise<T>;
 
   async reply<T>(
@@ -268,9 +268,9 @@ export class OutputClass implements OutputProps {
       | ((
           ctx: CommandContext & {
             repObj: PromiseStandardReplyArg<T>;
-          }
+          },
         ) => any | Promise<any>),
-    callbackRep: (info: OutputSent) => void = (_info) => {}
+    callbackRep: (info: OutputSent) => void = (_info) => {},
   ): Promise<OutputSent | T> {
     if (typeof bodyOrListener === "function") {
       const listener = bodyOrListener;
@@ -319,7 +319,7 @@ export class OutputClass implements OutputProps {
   contact(
     text: string,
     id?: string,
-    destination?: string
+    destination?: string,
   ): Promise<OutputSent> {
     return this.dispatch({
       body: text,
@@ -336,12 +336,12 @@ export class OutputClass implements OutputProps {
    */
   error(
     err: unknown | string | Error,
-    callback: (info: any) => void = (_info) => {}
+    callback: (info: any) => void = (_info) => {},
   ): Promise<OutputSent> {
     let error = err;
     if (typeof error !== "object" && typeof error !== "string") {
       throw new Error(
-        `The first argument must be an Error instance or a string.`
+        `The first argument must be an Error instance or a string.`,
       );
     }
     if (typeof error === "string") {
@@ -361,7 +361,7 @@ export class OutputClass implements OutputProps {
   send(
     body: OutputForm,
     id?: string,
-    callback: (info: OutputSent) => void = (_info) => {}
+    callback: (info: OutputSent) => void = (_info) => {},
   ): Promise<OutputSent> {
     return this.dispatch(body, { callback, threadID: id });
   }
@@ -384,7 +384,7 @@ export class OutputClass implements OutputProps {
    */
   kick(
     user: string,
-    thread: string = this.#ctx.input?.threadID
+    thread: string = this.#ctx.input?.threadID,
   ): Promise<void> {
     return this.api.removeUserFromGroup(user, thread, (_err) => {});
   }
@@ -415,8 +415,8 @@ export class OutputClass implements OutputProps {
     reactListener: (
       ctx: CommandContext & {
         repObj: PromiseStandardReplyArg<T>;
-      }
-    ) => any | Promise<any>
+      },
+    ) => any | Promise<any>,
   ): Promise<T>;
 
   reaction<T>(
@@ -425,9 +425,9 @@ export class OutputClass implements OutputProps {
       | ((
           ctx: CommandContext & {
             repObj: PromiseStandardReplyArg<T>;
-          }
+          },
         ) => any | Promise<any>),
-    mid: string = this.#ctx.input?.messageID
+    mid: string = this.#ctx.input?.messageID,
   ) {
     if (typeof emojiOrListener === "function") {
       if (!this.LASTID) {
@@ -472,7 +472,7 @@ export class OutputClass implements OutputProps {
   replyStyled(
     form: OutputForm,
     style: CassidySpectra.CommandStyle,
-    thread?: string
+    thread?: string,
   ): Promise<OutputSent> {
     return this.dispatch(form, {
       threadID: thread,
@@ -491,7 +491,7 @@ export class OutputClass implements OutputProps {
   sendStyled(
     form: OutputForm,
     style: CassidySpectra.CommandStyle,
-    thread?: string
+    thread?: string,
   ): Promise<OutputSent> {
     return this.dispatch(form, {
       threadID: thread,
@@ -509,7 +509,7 @@ export class OutputClass implements OutputProps {
   async attach(
     form: OutputForm,
     stream: string | Readable[] | Readable | any,
-    style?: CassidySpectra.CommandStyle
+    style?: CassidySpectra.CommandStyle,
   ): Promise<OutputSent> {
     const body = form;
     try {
@@ -542,7 +542,7 @@ export class OutputClass implements OutputProps {
   wentWrong(): Promise<OutputSent> {
     return this.dispatch(
       "❌ Sorry, something went wrong. This message indicates that an **unexpected issue has occurred**, which may lead to potential problems if not addressed. **It is uncommon to see this message**, as it is primarily used for rapid edge case handling and debugging. Better error messages will be added in the **future**. Please **report** this to the administrator or developer for further investigation.",
-      { isReply: true }
+      { isReply: true },
     );
   }
 
@@ -565,7 +565,7 @@ export class OutputClass implements OutputProps {
     return this.reply(
       `❌ The command syntax you are using is invalid, please use ${
         cmdName ? `${obj.prefix}help ${cmdName}` : `the help command`
-      } to see how it works.`
+      } to see how it works.`,
     );
   }
 
@@ -582,7 +582,7 @@ export class OutputClass implements OutputProps {
     mid: string,
     delay?: number,
     style?: any,
-    options?: StrictOutputForm
+    options?: StrictOutputForm,
   ): Promise<boolean> {
     options ??= {};
     const obj = this.#ctx;
@@ -630,7 +630,7 @@ export class OutputClass implements OutputProps {
     ) {
       let hasS = Boolean(input.senderID);
       const { name } = await obj.money.getCache(
-        options.threadID ?? input.senderID
+        options.threadID ?? input.senderID,
       );
       const finalName = this.UIName || name;
       let isOther = finalName !== name;
@@ -653,7 +653,7 @@ export class OutputClass implements OutputProps {
     ) {
       let hasS = Boolean(input.senderID);
       const { cassEXP, name } = await obj.money.getCache(
-        options.threadID ?? input.senderID
+        options.threadID ?? input.senderID,
       );
       const inst = new CassEXP(cassEXP);
       const finalName = this.UIName || name;
@@ -673,7 +673,7 @@ export class OutputClass implements OutputProps {
 
   async dispatch(
     body: OutputForm,
-    options: StrictOutputForm = { body: "" }
+    options: StrictOutputForm = { body: "" },
   ): Promise<OutputSent> {
     const text = body;
     const obj = this.#ctx;
@@ -730,12 +730,12 @@ export class OutputClass implements OutputProps {
               {},
               options.style ?? {},
               input.style ?? {},
-              STYLE ?? {}
-            )
+              STYLE ?? {},
+            ),
           )
         : styler.shallowMake(
             Object.assign({}, options.defStyle ?? {}, input.defStyle ?? {}),
-            Object.assign({}, options.style ?? {}, input.style ?? {})
+            Object.assign({}, options.style ?? {}, input.style ?? {}),
           );
 
       if (options.body) {
@@ -855,7 +855,7 @@ export class OutputClass implements OutputProps {
           this.api.shareContact(
             options.body,
             optionsCopy.contactID,
-            optionsCopy.threadID || event.threadID
+            optionsCopy.threadID || event.threadID,
           );
           res(
             // @ts-ignore
@@ -865,14 +865,14 @@ export class OutputClass implements OutputProps {
               messageID: newMid,
               senderID: this.api.getCurrentUserID(),
               body: options.body,
-            })
+            }),
           );
           return;
         }
 
         const cbb = async (
           err: any,
-          info: { messageID: string; threadID: string; timestamp: number }
+          info: { messageID: string; threadID: string; timestamp: number },
         ) => {
           if (typeof optionsCopy.callback === "function") {
             // @ts-ignore
@@ -902,7 +902,7 @@ export class OutputClass implements OutputProps {
             optionsCopy.threadID || event.threadID,
             cbb,
             optionsCopy.messageID ||
-              (optionsCopy.isReply ? event.messageID : null)
+              (optionsCopy.isReply ? event.messageID : null),
           );
         } else {
           const res = await api.sendMessage(
@@ -911,7 +911,7 @@ export class OutputClass implements OutputProps {
             options,
             optionsCopy.threadID || event.threadID,
             optionsCopy.messageID ||
-              (optionsCopy.isReply ? event.messageID : null)
+              (optionsCopy.isReply ? event.messageID : null),
           );
           cbb(null, res);
         }
@@ -993,9 +993,9 @@ export class OutputClass implements OutputProps {
   async confirm(
     body: string,
     done?: (
-      ctx: CommandContext & { yes: boolean; no: boolean }
+      ctx: CommandContext & { yes: boolean; no: boolean },
     ) => any | Promise<any>,
-    extraStyle?: CommandStyle
+    extraStyle?: CommandStyle,
   ): Promise<CommandContext & { yes: boolean; no: boolean }> {
     const text = `⚠️ ${body}\n${UNIRedux.standardLine}\n**Yes** | **No**`;
     const info = extraStyle
@@ -1017,7 +1017,7 @@ export class OutputClass implements OutputProps {
           };
           if (!newCtx.yes && !newCtx.no) {
             return repCtx.output.reply(
-              `❌ Invalid response, please go back and reply either **yes** or **no**.`
+              `❌ Invalid response, please go back and reply either **yes** or **no**.`,
             );
           }
           done?.(newCtx);
@@ -1040,8 +1040,8 @@ export class OutputClass implements OutputProps {
     callback?: (
       ctx: CommandContext & {
         repObj: PromiseStandardReplyArg<T>;
-      }
-    ) => any | Promise<any>
+      },
+    ) => any | Promise<any>,
   ) => Promise<T>;
 
   /**
@@ -1056,8 +1056,8 @@ export class OutputClass implements OutputProps {
     callback?: (
       ctx: CommandContext & {
         repObj: PromiseStandardReplyArg<T>;
-      }
-    ) => any | Promise<any>
+      },
+    ) => any | Promise<any>,
   ) => Promise<T>;
 
   /**
@@ -1073,9 +1073,9 @@ export class OutputClass implements OutputProps {
       | ((
           ctx: CommandContext & {
             repObj: PromiseStandardReplyArg<T>;
-          }
+          },
         ) => any | Promise<any>)
-      | undefined
+      | undefined,
   ) => Promise<CommandContext["input"]>;
 
   /**
@@ -1091,9 +1091,9 @@ export class OutputClass implements OutputProps {
       | ((
           ctx: CommandContext & {
             reObj: PromiseStandardReplyArg<T>;
-          }
+          },
         ) => any | Promise<any>)
-      | undefined
+      | undefined,
   ) => Promise<CommandContext["input"]>;
 
   /**
@@ -1110,7 +1110,7 @@ export class OutputClass implements OutputProps {
       author?: string;
       edit?: string;
       emoji?: string;
-    }
+    },
   ) => Promise<CommandContext["input"]>;
 
   selectItem: BriefcaseAPI.BoundSelectItem;
@@ -1141,7 +1141,7 @@ export class OutputSent implements OutputResultInf {
 
   constructor(
     ctx: CommandContext | NoEventCMDContext,
-    result: OutputResultInf
+    result: OutputResultInf,
   ) {
     Object.assign(this, result);
 
@@ -1191,7 +1191,7 @@ export class OutputSent implements OutputResultInf {
     >[2] = undefined,
     style: Parameters<
       import("output-cassidy").OutputProps["edit"]
-    >[3] = undefined
+    >[3] = undefined,
   ) {
     return this.#ctx.output.edit(text, this.messageID, delay, style);
   }

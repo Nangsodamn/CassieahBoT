@@ -1,7 +1,7 @@
 {
   "name": "cassieah-bot",
   "author": "Liane Cagara",
-  "version": "4.4.1-dev",
+  "version": "4.4.2-dev",
   "description": "(Formerly CassidySpectra) Reworked Versatile Facebook Bot framework that provides many features.",
   "main": "index.js",
   "scripts": {
@@ -9,21 +9,12 @@
     "build": "[ ! -d ./dist-commandfiles ] && (command -v npx >/dev/null 2>&1 && npx tsc || tsc) || echo 'dist-commandfiles exists, skipping compilation'",
     "dev": "node dist-commandfiles/index.js",
     "clean": "rm -rf ./dist-commandfiles",
-    "update": "sh updater.sh",
-    "postinstall": "patch-package"
+    "update": "sh updater.sh"
   },
   "keywords": [],
   "type": "commonjs",
   "license": "ISC",
   "dependencies": {
-    "@distube/ytdl-core": "^4.16.6",
-    "@napi-rs/canvas": "^0.1.77",
-    "@types/axios": "^0.9.36",
-    "@types/cors": "^2.8.17",
-    "@types/form-data": "^2.2.1",
-    "@types/fs-extra": "^11.0.4",
-    "@types/node": "^22.15.19",
-    "@types/string-similarity": "^4.0.2",
     "@vitalets/google-translate-api": "^9.2.0",
     "@xaviabot/fca-unofficial": "^1.4.0",
     "axios": "^1.7.2",
@@ -61,7 +52,6 @@
     "mongoose-memory": "^1.1.2",
     "pastebin-api": "^7.0.0",
     "pastebin-js": "^1.0.6",
-    "patch-package": "^8.0.0",
     "random-js": "^2.1.0",
     "readline-sync": "^1.4.10",
     "request": "^2.88.2",
@@ -88,7 +78,15 @@
     "@types/source-map-support": "^0.5.10",
     "@types/yt-search": "^2.10.3",
     "git-cliff": "^2.8.0",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "@distube/ytdl-core": "^4.16.6",
+    "@napi-rs/canvas": "^0.1.77",
+    "@types/axios": "^0.9.36",
+    "@types/cors": "^2.8.17",
+    "@types/form-data": "^2.2.1",
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^22.15.19",
+    "@types/string-similarity": "^4.0.2"
   },
   "engines": {
     "node": "23.7.0"

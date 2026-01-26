@@ -1,3 +1,4 @@
+import { UNISpectra } from "@cassidy/unispectra";
 import { FontSystem, UNIRedux } from "cassidy-styler";
 const { fonts } = FontSystem;
 
@@ -27,13 +28,15 @@ export const etcTagMappings = {
     pretendUsed(text, node);
     return "\n";
   },
-  standardLine(text: string, node: VNode) {
+  line(text: string, node: VNode) {
+    const len = Number(node?.props?.length) || 15;
     pretendUsed(text, node);
-    return `\n${UNIRedux.standardLine}\n`;
+    return `\n${"━".repeat(len)}\n`;
   },
   title(text: string, node: VNode) {
+    const len = Number(node?.props?.linelength) || 15;
     const font = node?.props?.font ?? "bold";
-    return `${fonts[font](text)}\n${UNIRedux.standardLine}\n`;
+    return `${fonts[font](text)}\n${"━".repeat(len)}\n`;
   },
   content(text: string, node: VNode) {
     const font = node?.props?.font ?? "fancy";
@@ -55,17 +58,20 @@ function processChildren(node: VNode): string {
   const text = Array.isArray(children)
     ? children
         .map((child) =>
-          typeof child === "string" ? child : processChildren(child)
+          typeof child === "string" ? child : processChildren(child),
         )
         .join("")
     : typeof children === "string"
-    ? children
-    : processChildren(children);
+      ? children
+      : processChildren(children);
   if (!node.tag) {
     return text;
   }
   if (node.tag in etcTagMappings) {
     return etcTagMappings[node.tag](text, node);
+  }
+  if (node.tag in UNISpectra) {
+    return UNISpectra[node.tag];
   }
   const fontKey = node.tag.replace(/^f_/, "") as CassidySpectra.FontTypes;
 

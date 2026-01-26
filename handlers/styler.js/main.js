@@ -69,11 +69,11 @@ export function convertLegacyStyling(style) {
               typeof style.title === "object"
                 ? "Title Invalid"
                 : customEnabled
-                ? forceTitleFormat(
-                    String(style.title),
-                    CUSTOM_STYLE.TITLE_PATTERN
-                  )
-                : emojiEnd(String(style.title)),
+                  ? forceTitleFormat(
+                      String(style.title),
+                      CUSTOM_STYLE.TITLE_PATTERN,
+                    )
+                  : emojiEnd(String(style.title)),
             [`line_bottom${
               !style.topLine || style.topLine === "default"
                 ? ""
@@ -118,7 +118,7 @@ export function parseTemplate(text, ...replacers) {
       if (typeof replacer === "string") {
         text = text.replace(
           new RegExp(`%${index + 1}(?!\\d)`, "g"),
-          String(replacer)
+          String(replacer),
         );
       } else if (replacer && typeof replacer === "object") {
         for (const key in replacer) {
@@ -150,7 +150,13 @@ export class CassidyResponseStyler {
     this.style = style;
     this.key = key;
     this.#originalX = JSON.parse(JSON.stringify(style));
+    this.fc = null;
   }
+
+  /**
+   * @type {null | Cassieah.StyleFC}
+   */
+  fc;
   /**
    *
    * @param {string} text
@@ -159,6 +165,9 @@ export class CassidyResponseStyler {
    */
   text(text, ...templates) {
     const self = this;
+    if (self.fc) {
+      return self.fc({ children: text });
+    }
     return styled(text ?? self.style.content, {
       [self.key]: {
         ...self.style,
@@ -175,12 +184,12 @@ export class CassidyResponseStyler {
   cloneField() {
     return new CassidyResponseStyler(
       JSON.parse(JSON.stringify(style)),
-      this.key
+      this.key,
     );
   }
   cloneOriginal() {
     return new CassidyResponseStyler(
-      JSON.parse(JSON.stringify(this.#originalX))
+      JSON.parse(JSON.stringify(this.#originalX)),
     );
   }
   changeContent(content, ...args) {
@@ -204,7 +213,13 @@ export class CassidyResponseStylerControl {
     }
     this.#origFields = JSON.parse(JSON.stringify(f));
     this.#fields = JSON.parse(JSON.stringify(f));
+    this.fc = null;
   }
+
+  /**
+   * @type {null | Cassieah.StyleFC}
+   */
+  fc;
   activateAllPresets() {
     const fields = this.#fields;
     if (fields.preset) {
@@ -213,7 +228,7 @@ export class CassidyResponseStylerControl {
       }
       for (const preset of fields.preset) {
         const data = JSON.parse(
-          JSON.stringify(global.Cassidy.presets.get(preset))
+          JSON.stringify(global.Cassidy.presets.get(preset)),
         );
         if (!data) {
           continue;
@@ -224,14 +239,16 @@ export class CassidyResponseStylerControl {
     }
   }
   shallowMake(...styles) {
-    return new CassidyResponseStylerControl(
+    let a = new CassidyResponseStylerControl(
       Object.assign(
         {},
         styles[0],
         JSON.parse(JSON.stringify(this.#fields)),
-        ...styles.slice(1)
-      )
+        ...styles.slice(1),
+      ),
     );
+    a.fc = this.fc;
+    return a;
   }
   #proc(data, key) {
     return new CassidyResponseStyler(data, key);
@@ -275,6 +292,9 @@ export class CassidyResponseStylerControl {
     return this.#proc({}, key);
   }
   text(text, keyContent) {
+    if (this.fc) {
+      return this.fc({ children: text });
+    }
     if (keyContent) {
       const clone = this.cloneAll();
       return clone.changeContents(keyContent).text(text);
@@ -286,6 +306,9 @@ export class CassidyResponseStylerControl {
     return this.#fields;
   }
   html(text, keyContent) {
+    if (this.fc) {
+      return this.fc({ children: text });
+    }
     if (keyContent) {
       const clone = this.cloneAll();
       return clone.changeContents(keyContent).html(text);
@@ -390,7 +413,7 @@ export function styled(text = "", StyleClass) {
         container[key] = parseTemplate(
           // @ts-ignore
           container[key],
-          ...ownStyling.content_template
+          ...ownStyling.content_template,
         );
       }
       container[key] = applyLine(container[key], ownStyling);
@@ -398,7 +421,7 @@ export function styled(text = "", StyleClass) {
         container[key] = parseTemplate(
           // @ts-ignore
           container[key],
-          ...ownStyling.content_template
+          ...ownStyling.content_template,
         );
       }
       container[key] = applyText(container[key], ownStyling);
@@ -463,7 +486,7 @@ export function numberFont(text, font) {
 export function autoBold(text) {
   text = String(text);
   text = text.replace(/\*\*\*(.*?)\*\*\*/g, (_, text) =>
-    fonts.bold_italic(text)
+    fonts.bold_italic(text),
   );
   text = text.replace(/\*\*(.*?)\*\*/g, (_, text) => fonts.bold(text));
 
@@ -481,7 +504,7 @@ export function fontTag(text) {
   text = String(text);
   text = text.replace(
     /\[font=(.*?)\]\s*(.*?)\s*\[:font=(.*?)\]/g,
-    (_, font, text, font2) => (font === font2 ? fonts[font](text) : text)
+    (_, font, text, font2) => (font === font2 ? fonts[font](text) : text),
   );
   return text;
 }
@@ -745,7 +768,7 @@ export function styledForHTML(text = "", StyleClass) {
             ? font === "bold"
               ? `<b>${content}</b>`
               : fonts[font](content)
-            : content
+            : content,
       );
       return txt;
     }

@@ -47,7 +47,7 @@ async function fetchMeta(uid, force) {
 
     cache[uid] = meta;
 
-    console.log(meta);
+    // console.log(meta);
 
     return cache[uid];
   } catch (err) {

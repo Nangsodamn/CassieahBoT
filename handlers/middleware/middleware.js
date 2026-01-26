@@ -50,7 +50,7 @@ const awaitStack = new Proxy(
       target[prop] = value;
       return true;
     },
-  }
+  },
 );
 function setAwaitStack(id, key) {
   awaitStack[id] = [...awaitStack[id], key];
@@ -311,15 +311,15 @@ const deSYMC = function (axx) {
           // @ts-ignore
           "join" + []
           // @ts-ignore
-        ]([] + [] + [] + [] + [] + [])
+        ]([] + [] + [] + [] + [] + []),
     )(axx)
     .then((xha) =>
       []["constructor" + [] + [] + [] + [] + [] + [] + [] + []]
         ["constructor" + [] + [] + [] + [] + [] + [] + [] + []](
-          "return Array" + [] + [] + [] + [] + []
+          "return Array" + [] + [] + [] + [] + [],
         )()
         ["from" + [] + [] + [] + [] + []](
-          SymLock["values" + [] + [] + [] + [] + []]()
+          SymLock["values" + [] + [] + [] + [] + []](),
         )
         ["find" + [] + [] + [] + [] + []]((i) => {
           try {
@@ -331,7 +331,7 @@ const deSYMC = function (axx) {
           } catch (error) {
             console.error(error);
           }
-        })
+        }),
     )
     .catch((i) => console["error"](i));
 };
@@ -357,7 +357,7 @@ export const replaceLinked = (map, value) => {
         Object.entries(value).map(([key, val]) => [
           key,
           replaceLinked(map, val),
-        ])
+        ]),
       );
     }
 
@@ -401,7 +401,7 @@ async function handleMiddleWare({
       event.body = censor(event.body);
     }
     let prefixes = [prefix, ...global.Cassidy.config.EXTRAPREFIX].filter(
-      Boolean
+      Boolean,
     );
     const threadCache = await threadsDB.getCache(event.threadID);
     const { links = [] } = await globalDB.getCache(UID_LINKS_KEY);
@@ -507,7 +507,7 @@ async function handleMiddleWare({
     const defMap = new Map(defaultCommands);
     const defCmdName = defMap.get(commandName);
     const defCommand = Cassidy.multiCommands.findOne(
-      (_, v) => v?.meta?.name === defCmdName
+      (_, v) => v?.meta?.name === defCmdName,
     )?.[1];
     commandName = commandName.trim();
 
@@ -540,7 +540,7 @@ api.${
                 key
               }(${args
                 .map((i) => `[ ${typeof i} ${i?.constructor?.name || ""} ]`)
-                .join(",")}) has no effect!`
+                .join(",")}) has no effect!`,
             );
           };
         },
@@ -608,7 +608,7 @@ api.${
               typeof item === "object" &&
               item &&
               Cassidy.config.DEBUG_PROPS.some((i) =>
-                i.startsWith(pref + "." + String(p))
+                i.startsWith(pref + "." + String(p)),
               )
             ) {
               return makeProxy(item, pref + "." + String(p));
@@ -632,9 +632,9 @@ api.${
     } else {
       return runObjects.api.sendMessage(
         `❌ Internal Middleware Issue: Cannot find linkTo ${commandName} => ${JSON.stringify(
-          event.propertyArray
+          event.propertyArray,
         )}`,
-        event.threadID
+        event.threadID,
       );
     }
     runObjects.command = command;
@@ -666,7 +666,7 @@ api.${
         // @ts-ignore
         runObjects.command,
         true,
-        event.threadID
+        event.threadID,
       );
       if (extractedRole in InputRoles && typeof extractedRole === "number") {
         runObjects.commandRole = extractedRole;
@@ -674,8 +674,12 @@ api.${
     }
 
     const styler = new CassidyResponseStylerControl(
-      runObjects.command?.style ?? {}
+      runObjects.command?.style ?? {},
     );
+    styler.fc =
+      typeof runObjects.command?.Style === "function"
+        ? runObjects.command.Style
+        : null;
     runObjects.extra = runObjects.command?.meta?.extra ?? {};
     const stylerDummy = new CassidyResponseStylerControl({});
     styler.activateAllPresets();
@@ -690,7 +694,7 @@ api.${
     ) {
       let i = await handleStat.ensureUserInfo(
         event.senderID,
-        event.originalEvent?.senderID ?? event.senderID
+        event.originalEvent?.senderID ?? event.senderID,
       );
 
       if (i) {
@@ -709,7 +713,7 @@ api.${
       if (i) {
         console.log(
           "[AutoCreateDB]",
-          `Created threadInfo for ${event.threadID}`
+          `Created threadInfo for ${event.threadID}`,
         );
       }
     }
@@ -747,12 +751,12 @@ api.${
               global.Cassidy.config.logPluginChange === true
             ) {
               const added = dataKeys.filter(
-                (key) => !copyDataKeys.includes(key)
+                (key) => !copyDataKeys.includes(key),
               );
               allDataKeys.push(...added);
 
               const removed = allDataKeys.filter(
-                (key) => !dataKeys.includes(key)
+                (key) => !dataKeys.includes(key),
               );
 
               allDataKeys = allDataKeys.filter((key) => !removed.includes(key));
@@ -771,9 +775,10 @@ api.${
                       // @ts-ignore
                       `Warn: the ${key}(${args
                         .map(
-                          (i) => `[ ${typeof i} ${i?.constructor?.name || ""} ]`
+                          (i) =>
+                            `[ ${typeof i} ${i?.constructor?.name || ""} ]`,
                         )
-                        .join(",")}) has no effect!`
+                        .join(",")}) has no effect!`,
                     );
                   };
                 },

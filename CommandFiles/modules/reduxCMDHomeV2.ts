@@ -124,10 +124,10 @@ export class ReduxCMDHome {
         ctx.prefix
       );
 
-      console.log(
-        "No matching targets found, calling home function with itemList:",
-        itemList
-      );
+      // console.log(
+      //   "No matching targets found, calling home function with itemList:",
+      //   itemList
+      // );
       ctx.cancelCooldown?.();
 
       if (typeof home === "function") {
@@ -150,9 +150,9 @@ export class ReduxCMDHome {
     commandName: string,
     prefix = global.Cassidy.config.PREFIX
   ) {
-    console.log(
-      `Creating item list for command: ${commandName} with prefix: ${prefix}`
-    );
+    // console.log(
+    //   `Creating item list for command: ${commandName} with prefix: ${prefix}`
+    // );
     return (
       `${UNIRedux.disc} **${prefix}${commandName}${
         this.options.isHypen ? "-" : " "

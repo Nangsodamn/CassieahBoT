@@ -847,7 +847,6 @@ export async function reply({ input, output, repObj, detectID }: any) {
   const { id, results, mode } = repObj;
 
   if (input.senderID !== id || !results) {
-    console.log("Reply ignored: Invalid sender or no results");
     return;
   }
 
@@ -871,7 +870,6 @@ export async function reply({ input, output, repObj, detectID }: any) {
 
   const selection = parseInt(selectionInput);
   if (isNaN(selection) || selection < 1 || selection > results.length) {
-    console.log("Invalid selection:", input.body);
     await output.react("🔢");
     return output.reply(
       `❌ Please select a number between 1 and ${results.length}.`
@@ -880,7 +878,6 @@ export async function reply({ input, output, repObj, detectID }: any) {
 
   const selectedLocation: NominatimLocation = results[selection - 1];
   if (!selectedLocation) {
-    console.log("No location found for selection:", selection);
     await output.react("😕");
     return output.reply(`❌ Invalid selection.`);
   }

@@ -148,7 +148,6 @@ async function main({
       }
     }
   }
-  console.log(res, form);
 
   await output.reaction("🟢");
   const info = await output.reply(form);

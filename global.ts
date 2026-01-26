@@ -383,7 +383,7 @@ declare global {
           uid: string,
           luckStat2: number | "random",
           range1?: number,
-          range2?: number
+          range2?: number,
         ): Promise<number | undefined>;
       };
     };
@@ -477,7 +477,7 @@ declare global {
      * Retrieves the current inflation rate.
      */
     getInflationRate?: (
-      usersData?: Record<string, UserData>
+      usersData?: Record<string, UserData>,
     ) => Promise<number>;
 
     /**
@@ -900,8 +900,21 @@ declare global {
       run?: CommandEntry;
       handleEvent?: CommandHandler;
       handleReply?: CommandHandler;
+
+      Style?: StyleFC;
+
       [name: string]: any;
     }
+
+    export interface FC<Props extends Record<string, any> = {}> {
+      (props: Props): JSX.Element;
+    }
+
+    export interface StyleFCProps {
+      children: string;
+    }
+
+    export interface StyleFC extends FC<StyleFCProps> {}
 
     export interface Meta extends CommandMeta {}
     export interface Style extends CommandStyle {}
@@ -1056,25 +1069,25 @@ declare global {
     };
 
     export type CommandHandler = (
-      context: CommandContext
+      context: CommandContext,
     ) => Promise<any> | any;
 
     export type CommandMiddleware = (
       context: CommandContext,
-      next: () => Promise<void>
+      next: () => Promise<void>,
     ) => Promise<void>;
 
     export type CommandLoader = (
-      context: CommandContext
+      context: CommandContext,
     ) => Promise<void> | void;
 
     export type ErrorHandler = (
       error: Error,
-      context: CommandContext
+      context: CommandContext,
     ) => Promise<void> | void;
 
     export type CooldownHandler = (
-      context: CommandContext
+      context: CommandContext,
     ) => Promise<void> | void;
 
     export type DuringLoadHandler = () => Promise<void> | void;
@@ -1282,7 +1295,7 @@ declare global {
      */
     forEachKey<T extends Record<string, any>>(
       this: T,
-      callback: (key: string, value: T[keyof T]) => void
+      callback: (key: string, value: T[keyof T]) => void,
     ): void;
 
     /**
@@ -1297,7 +1310,7 @@ declare global {
      */
     mapAsync<T, U>(
       this: Record<string, T>,
-      callback: (value: T, key: string) => Promise<U>
+      callback: (value: T, key: string) => Promise<U>,
     ): Promise<Record<string, U>>;
 
     /**
@@ -1312,7 +1325,7 @@ declare global {
      */
     map<T, U>(
       this: Record<string, T>,
-      callback: (value: T, key: string) => U
+      callback: (value: T, key: string) => U,
     ): Record<string, U>;
   }
 
@@ -1396,7 +1409,7 @@ declare global {
      */
     map<U>(
       this: string,
-      callback: (char: string, index: number, array: string[]) => U
+      callback: (char: string, index: number, array: string[]) => U,
     ): U[];
 
     /**
@@ -1425,7 +1438,7 @@ declare global {
      * @reusable Safe within CassidySpectra projects
      */
     toCallable<T extends new (...args: any[]) => any>(
-      this: T
+      this: T,
     ): (...args: ConstructorParameters<T>) => InstanceType<T>;
 
     /**
@@ -1436,7 +1449,7 @@ declare global {
      * @reusable Safe within CassidySpectra projects
      */
     toCallable<T extends (...args: any[]) => any>(
-      this: T
+      this: T,
     ): (...args: Parameters<T>) => ReturnType<T>;
 
     /**
@@ -1459,7 +1472,7 @@ declare global {
      */
     chain<T extends (...args: any[]) => any, U>(
       this: T,
-      nextFn: (result: ReturnType<T>) => U
+      nextFn: (result: ReturnType<T>) => U,
     ): (...args: Parameters<T>) => U;
 
     /**
@@ -1479,7 +1492,7 @@ declare global {
      * @reusable Safe within CassidySpectra projects
      */
     defer<T extends (...args: any[]) => any>(
-      this: T
+      this: T,
     ): (...args: Parameters<T>) => Promise<ReturnType<T>>;
 
     /**
@@ -1493,7 +1506,7 @@ declare global {
      */
     guard<T extends (...args: any[]) => any>(
       this: T,
-      config: CassTypes.TypeSchema
+      config: CassTypes.TypeSchema,
     ): T;
 
     /**
@@ -1510,7 +1523,7 @@ declare global {
         args: Parameters<T>;
         result: ReturnType<T>;
         fn: T;
-      }) => void
+      }) => void,
     ): T;
   }
 
@@ -1525,7 +1538,7 @@ declare global {
      */
     retry<T extends (...args: any[]) => any>(
       this: T,
-      attempts: number
+      attempts: number,
     ): (...args: Parameters<T>) => ReturnType<T>;
 
     /**
@@ -1538,7 +1551,7 @@ declare global {
      */
     throttle<T extends (...args: any[]) => any>(
       this: T,
-      ms: number
+      ms: number,
     ): (...args: Parameters<T>) => void;
 
     /**
@@ -1551,7 +1564,7 @@ declare global {
      */
     debounce<T extends (...args: any[]) => any>(
       this: T,
-      ms: number
+      ms: number,
     ): (...args: Parameters<T>) => void;
 
     /**
@@ -1564,7 +1577,7 @@ declare global {
      */
     tap<T extends (...args: any[]) => any>(
       this: T,
-      callback: (...args: Parameters<T>) => void
+      callback: (...args: Parameters<T>) => void,
     ): T;
 
     /**
@@ -1580,7 +1593,7 @@ declare global {
     after<T extends (...args: any[]) => any>(
       this: T,
       delay: number,
-      unit?: "ms" | "s" | "m"
+      unit?: "ms" | "s" | "m",
     ): (...args: Parameters<T>) => Promise<ReturnType<T>>;
 
     /**
@@ -1591,9 +1604,9 @@ declare global {
      */
     assignStatic<
       T extends (...args: any[]) => any,
-      M extends Record<string, any>
+      M extends Record<string, any>,
     >(
-      methods: M
+      methods: M,
     ): ReturnType<typeof createCallable<T, M>>;
 
     /**
@@ -1606,7 +1619,7 @@ declare global {
      */
     wrap<T extends (...args: any[]) => any, R>(
       this: T,
-      callback: (fn: T, ...args: Parameters<T>) => R
+      callback: (fn: T, ...args: Parameters<T>) => R,
     ): (...args: Parameters<T>) => R;
 
     /**
@@ -1652,6 +1665,11 @@ declare global {
     ? A
     : never;
   type ETCTags = typeof etcTagMappings;
+  type UnispectraJSX = {
+    [K in Lowercase<Exclude<keyof typeof UNISpectra, keyof Function>>]: {
+      children?: never;
+    };
+  };
 
   export namespace JSX {
     type Element = string;
@@ -1668,7 +1686,10 @@ declare global {
         font?: CassidySpectra.FontTypes;
         [key: string]: any;
       };
-    };
+    } & {
+      line: { length?: number };
+      title: { linelength?: number };
+    } & UnispectraJSX;
   }
 
   var GoatBot: typeof GoatFill.GoatBot;
@@ -1701,3 +1722,21 @@ declare global {
 }
 
 export default {};
+
+declare namespace JSX {
+  type Element = string;
+  type ElementFragment = string;
+
+  type IntrinsicElements = {
+    [K in CassidySpectra.FontTypes as `f_${K}`]: {
+      children?: JSX.Element | JSX.Element[] | string;
+      [key: string]: any;
+    };
+  } & {
+    [K in keyof ETCTags]: {
+      children?: JSX.Element | JSX.Element[] | string;
+      font?: CassidySpectra.FontTypes;
+      [key: string]: any;
+    };
+  };
+}

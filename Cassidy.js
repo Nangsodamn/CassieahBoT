@@ -14,7 +14,7 @@ global.utils = new Proxy(utils, {
   get(target, prop) {
     if (!(prop in target)) {
       throw new Error(
-        `The "global.utils.${String(prop)}" property does not exist in Cassidy!`
+        `The "global.utils.${String(prop)}" property does not exist in Cassidy!`,
       );
     }
     return target[prop];
@@ -53,6 +53,7 @@ import { removeCommandAliases } from "./CommandFiles/modules/unisym.js";
 import { ConsoleArray } from "@cass-modules/ConsoleArray";
 
 const checkMemoryUsage = (normal) => {
+  if (!Cassidy.config.VERBOSE_LOGGING) return;
   const memoryUsage = process.memoryUsage();
   const usedMemoryMB = memoryUsage.heapUsed / 1024 / 1024;
   if (usedMemoryMB > MEMORY_THRESHOLD) {
@@ -60,12 +61,12 @@ const checkMemoryUsage = (normal) => {
   } else if (usedMemoryMB > WARNING_THRESHOLD) {
     console.warn(
       `Warning: Memory usage is at 90% of the threshold: ${usedMemoryMB.toFixed(
-        2
-      )} MB`
+        2,
+      )} MB`,
     );
   } else if (normal) {
     console.log(
-      `Memory usage is within the threshold: ${usedMemoryMB.toFixed(2)} MB`
+      `Memory usage is within the threshold: ${usedMemoryMB.toFixed(2)} MB`,
     );
   }
 };
@@ -98,7 +99,7 @@ global.webQuery = new Proxy(
       }, 30 * 1000);
       return true;
     },
-  }
+  },
 );
 const upt = performance.now();
 
@@ -324,7 +325,11 @@ export async function loadAllCommands(callback = async () => {}) {
    */
   let errs = {};
   const fileNames = (await fs.promises.readdir("CommandFiles/commands")).filter(
-    (file) => file.endsWith(".js") || file.endsWith(".ts")
+    (file) =>
+      file.endsWith(".js") ||
+      file.endsWith(".ts") ||
+      file.endsWith(".tsx") ||
+      file.endsWith(".jsx"),
   );
 
   // const commandPromises = fileNames.map(async (fileName) => {
@@ -368,7 +373,7 @@ async function main() {
   logger(`Cassieah ${__pkg.version}`, "Info");
   logger(
     `The CassieahBoT is currently in development and is also unstable. Some features might not work as expected.`,
-    "WARN"
+    "WARN",
   );
   const loadLog = logger("Loading settings...", "Info");
 
@@ -382,12 +387,12 @@ async function main() {
       get(_, prop) {
         return loadSettings()[prop];
       },
-    }
+    },
   );
   if (!settings) {
     loadLog(
       "No settings found, please check if the settings are properly configured.",
-      "Info"
+      "Info",
     );
   } else {
     loadLog("Settings loaded!", "Info");
@@ -421,7 +426,7 @@ async function main() {
     } else {
       logger(
         "Skipping facebook login, no cookie or valid credentials found or FB Login was disabled.",
-        "FCA"
+        "FCA",
       );
     }
   } catch (error) {
@@ -528,10 +533,10 @@ function setupRestart() {
           titleFont: "none",
           contentFont: "fancy",
           content: `✅ Restarted!\n\n⏳ **Time Took**: ${formatTimeSentence(
-            ela
+            ela,
           )}`,
         }),
-        tid
+        tid,
       );
     }
     Cassidy.config.RESTART_CACHE = "";
@@ -543,7 +548,7 @@ function setupAutoRestart() {
     const interval = mqttRestart.interval || 3600000;
     logger(
       `Auto-restart enabled. Restarting every ${interval / 1000 / 60} minutes.`,
-      "AUTORESTART"
+      "AUTORESTART",
     );
     setInterval(restartProcess, interval);
   }
@@ -563,13 +568,13 @@ async function setupCommands() {
       {
         locale: "default",
         commands: Array.from(
-          Object.values(removeCommandAliases(global.Cassidy.commands))
+          Object.values(removeCommandAliases(global.Cassidy.commands)),
         ).map((command) => ({
           name: String(command.meta.name).slice(0, 32),
           description:
             `${command.meta.description} (by ${command.meta.author})`.slice(
               0,
-              64
+              64,
             ),
         })),
       },
@@ -593,7 +598,7 @@ async function setupCommands() {
           console.error("Error setting commands:", error || body.error);
           reject(error || body.error);
         }
-      }
+      },
     );
   });
 }
@@ -670,7 +675,7 @@ function web(api, funcListen, _) {
 
         res.setHeader(
           "Content-Disposition",
-          `attachment; filename="${temp.getFilename()}"`
+          `attachment; filename="${temp.getFilename()}"`,
         );
 
         res.setHeader("Content-Type", String(type));
@@ -706,7 +711,7 @@ function web(api, funcListen, _) {
   app.get("/api/usercache", async (req, res) => {
     const { uid, format = "yes" } = req.query;
     const cache = await global.handleStat.getCache(
-      String(format === "yes" ? formatIP(String(uid)) : uid)
+      String(format === "yes" ? formatIP(String(uid)) : uid),
     );
 
     const userMeta = await fetchMeta(uid);
@@ -732,7 +737,7 @@ function web(api, funcListen, _) {
       const imageData = await takeScreenshot(
         req.query?.id,
         req.hostname,
-        req.query?.facebook
+        req.query?.facebook,
       );
       res.set("Content-Type", "image/png");
       res.send(imageData);
@@ -764,7 +769,7 @@ function web(api, funcListen, _) {
     if (req.query.fileName) {
       const fileData = fs.readFileSync(
         `CommandFiles/commands/${req.query.fileName}`,
-        "utf8"
+        "utf8",
       );
       const stat = fs.statSync(`CommandFiles/commands/${req.query.fileName}`);
       res.json({
@@ -864,7 +869,7 @@ function web(api, funcListen, _) {
           body: `📥 ${
             global.Cassidy.logo
           } is currently loading ${loaded}/${total} (${Math.floor(
-            (loaded / total) * 100
+            (loaded / total) * 100,
           )}%) commands.`,
         },
         status: "success",
@@ -891,7 +896,7 @@ function web(api, funcListen, _) {
           senderID: "custom_" + req.query.senderID,
           webQ: key,
         },
-        true
+        true,
       );
     });
     res.json(info);
@@ -922,7 +927,7 @@ function web(api, funcListen, _) {
           body: `📥 ${
             global.Cassidy.logo
           } is currently loading ${loaded}/${total} (${Math.floor(
-            (loaded / total) * 100
+            (loaded / total) * 100,
           )}%) commands.`,
         },
         status: "success",
@@ -949,7 +954,7 @@ function web(api, funcListen, _) {
           senderID: "custom_" + req.body.senderID,
           webQ: key,
         },
-        true
+        true,
       );
     });
     res.json(info);
@@ -961,7 +966,7 @@ function web(api, funcListen, _) {
         ...req.query,
         senderID: req.trueIP,
       },
-      true
+      true,
     );
     res.json({ okay: true, req: req.query });
   });
@@ -999,9 +1004,9 @@ export async function logSummary(api, config, cookie = [], loginErr) {
       config.noFB || process.env["test"]
         ? `Facebook Login is disabled in settings.json (noFB)`
         : String(cookie) !== "uwu" && cookie
-        ? `Facebook: Login fail.`
-        : `Facebook: No valid cookie found. Therefore no login happened.`,
-      "Summary"
+          ? `Facebook: Login fail.`
+          : `Facebook: No valid cookie found. Therefore no login happened.`,
+      "Summary",
     );
     if (loginErr) {
       logger(loginErr, "Facebook Error");
@@ -1012,7 +1017,7 @@ export async function logSummary(api, config, cookie = [], loginErr) {
     logger(`MONGO_URI (MongoDB uri) exists in .env`);
   } else {
     logger(
-      `MONGO_URI (MongoDB uri) does not exist in .env and the system may potentially use JSON Mode.`
+      `MONGO_URI (MongoDB uri) does not exist in .env and the system may potentially use JSON Mode.`,
     );
   }
 
@@ -1027,7 +1032,7 @@ export async function logSummary(api, config, cookie = [], loginErr) {
           ? `Uses MongoDB (${db.collection}). All data will be saved to a remote database.`
           : `Uses JSON File (${db.filePath}). Warning: changes JSON Files do not persists during deployment. Consider using MongoDB instead. Visit https://cloud.mongodb.com/ for info.`
       }`,
-      "Summary"
+      "Summary",
     );
     try {
       logger(`Documents in ${name}: ${(await db.getIDs()).length}`, "Summary");
@@ -1046,13 +1051,13 @@ export async function logSummary(api, config, cookie = [], loginErr) {
   console.log("");
   console.log("");
   console.log(
-    `   ░▄▀▀▒▄▀▄░▄▀▀░▄▀▀░█▒██▀▒▄▀▄░█▄█\n   ░▀▄▄░█▀█▒▄██▒▄██░█░█▄▄░█▀█▒█▒█`
+    `   ░▄▀▀▒▄▀▄░▄▀▀░▄▀▀░█▒██▀▒▄▀▄░█▄█\n   ░▀▄▄░█▀█▒▄██▒▄██░█░█▄▄░█▀█▒█▒█`,
   );
   console.log(`   Version ${__pkg.version}`);
   console.log("");
   console.log("");
   logger(
     `Made by Liane Cagara (lianecagara on github), (facebook.com/nealiana.kaye.cagara)`,
-    "Credit"
+    "Credit",
   );
 }

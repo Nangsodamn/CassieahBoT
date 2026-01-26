@@ -691,7 +691,7 @@ export function handleMessage(socket, data, listenCall, api) {
   const messageID = generateWssMessageID();
   listenCall ??= function () {};
   if (socket) {
-    console.log(`Sending data with messageID: ${messageID}`);
+    // console.log(`Sending data with messageID: ${messageID}`);
 
     sendAllWS({ ...data, messageID });
   }
@@ -699,7 +699,7 @@ export function handleMessage(socket, data, listenCall, api) {
     const { resolve } = api._queue.shift();
     if (resolve) {
       resolve(formatWssEvent({ ...data, messageID }));
-      console.log(`Resolved data with messageID: ${messageID}`);
+      // console.log(`Resolved data with messageID: ${messageID}`);
     }
     return;
   }

@@ -7,7 +7,7 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "esModuleInterop": true,
-    "jsxImportSource": "./handlers/definers/",
+    "jsxImportSource": "@defs",
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "noImplicitAny": false,
@@ -61,7 +61,8 @@
       "neax-script": ["./CommandFiles/modules/NeaxScript"],
       "@cassidy/jsx": ["./handlers/definers/jsx-runtime"],
       "@cass-interact": ["./CommandFiles/modules/CassInteract"],
-      "@root/*": ["./*"]
+      "@root/*": ["./*"],
+      "@defs/*": ["./handlers/definers/*"]
     }
   },
   "exclude": ["node_modules", "public"],

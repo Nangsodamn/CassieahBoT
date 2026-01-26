@@ -25,7 +25,7 @@ cassMenu.option(
     atReply(({ print }) => {
       print("Thanks for replying!");
     });
-  }
+  },
 );
 
 cassMenu.description("uwu", "Idk, just say uwu too.");
@@ -45,3 +45,5 @@ export default easyCMD({
     await runContextual(cassMenu);
   },
 });
+
+

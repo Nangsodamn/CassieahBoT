@@ -345,7 +345,6 @@ export class InputClass extends String implements InputProps {
       this.text = this.body;
 
       if (event.messageReply) {
-        console.log(Reflect.ownKeys(this.#__context), new Error());
         this.replier = new InputClass({
           ...this.#__context,
           // @ts-ignore
@@ -628,7 +627,6 @@ export class InputClass extends String implements InputProps {
           return ctx.repObj.resolve(ctx);
         };
       }
-      console.log(`New Reply listener for ${mid}`, callback.toString());
       return new Promise(async (resolve, reject) => {
         this.ReplySystem.set(mid, {
           // @ts-ignore
@@ -640,7 +638,6 @@ export class InputClass extends String implements InputProps {
         if (!keys.includes(mid)) {
           throw new Error("Unknown Issue: " + mid);
         } else {
-          console.log(keys);
         }
       });
     };
@@ -650,7 +647,7 @@ export class InputClass extends String implements InputProps {
 
         const i = await obj.output.reply({ body, referenceQ: obj.input.webQ });
         async function something(context, ...args) {
-          console.log(`input.webQ: ${input.webQ}, new; ${context.input.webQ}`);
+          // console.log(`input.webQ: ${input.webQ}, new; ${context.input.webQ}`);
           input.webQ = context.input.webQ;
           const func =
             callback ||
@@ -700,7 +697,6 @@ export class InputClass extends String implements InputProps {
           detectID,
           command: repCommand,
         } = replies[input.replier.messageID];
-        console.log("ReplySystem", replies[input.replier.messageID]);
         const { callback } = repObj;
         let command: Partial<CassidySpectra.CassidyCommand> =
           repCommand ??
@@ -742,7 +738,6 @@ export class InputClass extends String implements InputProps {
       const obj = this.#__context;
       const { reacts } = global.Cassidy;
       if (input.type == "message_reaction" && reacts[input.messageID]) {
-        console.log(`Handling reaction for ${input.messageID}`);
         const { reactObj, commandKey, detectID } = reacts[input.messageID];
         const { callback } = reactObj;
         const command: Partial<CassidySpectra.CassidyCommand> =
